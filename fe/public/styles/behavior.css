@@ -1,0 +1,21 @@
+.disable { pointer-events: none; opacity: 0.5 }
+.clickable { cursor: pointer; }
+
+button {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    padding-left: 1em; padding-right: 1em;
+    padding-top: 0.5em; padding-bottom: 0.5em;
+}
+
+input {
+    height: 30px;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+
+select {
+    height: 30px;
+    min-width: 60px;
+}

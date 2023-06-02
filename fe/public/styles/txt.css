@@ -1,0 +1,21 @@
+* {
+    font-family: sans-serif;
+}
+
+.t-t--u { text-transform: uppercase; }
+.t-t--c { text-transform: capitalize; }
+.t-t--l { text-transform: lowercase; }
+
+.ta-l { text-align: left }
+.ta-r { text-align: right }
+.ta-c { text-align: center }
+
+.fw-4 { font-weight: 400 }
+.fw-5 { font-weight: 500 }
+.fw-6 { font-weight: 600 }
+.fw-7 { font-weight: 700 }
+.fw-8 { font-weight: 800 }
+
+.fs-s { font-size: 0.85em }
+.fs-m { font-size: 1em }
+.fs-l { font-size: 1.15em}

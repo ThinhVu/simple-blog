@@ -1,0 +1,17 @@
+.act-angry { background-image: url("../assets/image/action/angry.png"); background-size: contain; }
+.act-care { background-image: url("../assets/image/action/care.png"); background-size: contain; }
+.act-haha { background-image: url("../assets/image/action/haha.png"); background-size: contain; }
+.act-like { background-image: url("../assets/image/action/like.png"); background-size: contain; }
+.act-love { background-image: url("../assets/image/action/love.png"); background-size: contain; }
+.act-sad { background-image: url("../assets/image/action/sad.png"); background-size: contain; }
+.act-wow { background-image: url("../assets/image/action/wow.png"); background-size: contain; }
+
+.ico { width: 16px; height: 16px; display: inline-block }
+img { max-width: 100% }
+
+#app {
+    font-family: monospace;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+}
