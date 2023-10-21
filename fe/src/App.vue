@@ -13,7 +13,6 @@
 </template>
 <script setup>
 import Dock from '@/components/Dock';
-import Bg from '@/components/Bg';
 import Api from '@/components/UiLib/Api/Api';
 import AuthDialog from '@/components/AuthDialog';
 import {authDialogVisible, hideAuthDialog} from '@/appState';

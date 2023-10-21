@@ -1,7 +1,16 @@
 <template>
-  <div class="px-4 py-4 br-10 mx-a fc fg-1" style="backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.3); min-width: 400px">
-    <img :src="avatar" style="width: 40px; height: 40px; border-radius: 20px" @click="selectAvatar"/>
-    <p><txt v-model="fullName" class="w-100" placeholder="Email"/></p>
+  <div class="px-4 py-4 br-10 mx-a fc fg-1" style="background: rgba(255,255,255); min-width: 400px">
+    <img v-if="avatar" :src="avatar"
+         style="width: 40px; height: 40px; border-radius: 20px; border: 1px solid #000;"/>
+    <div v-else class="fr ai-c" style="gap: 10px" @click="selectAvatar">
+      <div class="fr ai-c jc-c"
+           style="width: 40px; height: 40px; border-radius: 20px; border: 1px solid #000; cursor: pointer">
+        <span style="font-size: 20px">+</span>
+      </div>
+      <span>Upload your avatar</span>
+    </div>
+
+    <p><txt v-model="fullName" class="w-100" placeholder="Your full name"/></p>
     <div class="fr ai-c fg-1 mt-2">
       <button @click="close">x</button>
       <spacer/>

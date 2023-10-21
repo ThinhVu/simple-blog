@@ -26,7 +26,7 @@ router.get('/:id', async (req, res) => {
       internalError(e, res);
    }
 })
-router.post('/', async (req: AuthRequest, res) => {
+router.post('/', requireUser, async (req: AuthRequest, res) => {
    try {
       const {categories, type, text, textVi, textEn, audio, photos, videos, tags, of} = req.body;
       const ofPost = To.objectId(of, null);

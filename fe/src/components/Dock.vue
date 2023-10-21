@@ -1,6 +1,6 @@
 <template>
   <div class="w-100vw h-100vh rel">
-    <div class="abs top-0 left-0 w-100 fr ai-c fg-1 jc-c" style="background-color: #24292f; box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2); height: 50px">
+    <div class="abs top-0 left-0 w-100 fr ai-c fg-1 jc-c" style="z-index: 1; background-color: #24292f; box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2); height: 50px">
       <spacer/>
 
       <button v-if="!user" class="btn" @click="showAuthDialog">

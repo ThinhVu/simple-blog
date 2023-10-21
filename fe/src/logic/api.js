@@ -86,7 +86,7 @@ export const categoryAPI = {
 }
 
 export const postAPI = {
-  gets: async (uid, cid, page = 1) => exec(() => axios.get(`${API_URL}/?uid=${uid}&cid=${cid}&p=${page}`)),
+  gets: async (uid, cid, page = 1) => exec(() => axios.get(`${API_URL}/post?uid=${uid}&cid=${cid}&p=${page}`)),
   get: async (pid) => exec(() => axios.get(`${API_URL}/post/${pid}`)),
   update: async (pid, change) => exec(() => axios.put(`${API_URL}/post/${pid}`, change, axiosOpts)),
   create: async payload => exec((() => axios.post(`${API_URL}/post`, payload, axiosOpts))),
