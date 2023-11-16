@@ -6,9 +6,16 @@
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
-    "elysia": "latest"
+    "@elysiajs/bearer": "^0.7.0",
+    "@elysiajs/cors": "^0.7.2",
+    "@elysiajs/jwt": "^0.7.0",
+    "dotenv": "^16.3.1",
+    "elysia": "latest",
+    "lodash": "^4.17.21",
+    "mongoose": "^8.0.1"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.201",
     "bun-types": "latest"
   },
   "module": "src/index.js"
