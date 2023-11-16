@@ -1,2 +1,5 @@
-# simple-social-network
-A very simple social network
+# simple-blog
+
+A very simple blog.
+
+A place to experiment JS web framework/serverless
