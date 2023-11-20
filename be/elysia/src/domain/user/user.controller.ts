@@ -20,7 +20,7 @@ export default function useUser(app) {
   app.use(jwt({
     name: 'jwt',
     exp: '7d',
-    secret: process.env.SECRET
+    secret: process.env.SECRET || ''
   }))
 
   app.use(bearer())
@@ -32,7 +32,7 @@ export default function useUser(app) {
     if (!email) throw new Error('MISSING_FIELD: email')
     if (!email.match(EmailRegex)) throw new Error('INVALID_EMAIL_FORMAT')
     if (await isUserWithEmailExisted(email)) throw new Error('EMAIL_HAS_BEEN_USED')
-    return {data: {result: true}}
+    return {result: true}
   });
 
   app.post('/sign-up', async ({jwt, body: {email, password}, cookie}) => {
@@ -47,7 +47,7 @@ export default function useUser(app) {
     const authUser : AuthUser = {_id: user._id, email: user.email, password: user.password, role: user.role}
     const token = jwt.sign({user: authUser});
     cookie.value.token = token;
-    return {data: {user, token}}
+    return {user, token}
   })
 
   app.post('/sign-in', async ({jwt, body: {email, password}, cookie}) => {
@@ -65,7 +65,7 @@ export default function useUser(app) {
 
     cookie.value.token = token
 
-    return {data: {user: body, token}}
+    return {user: body, token}
   });
   app.post('/sign-out', async ({cookie}) => {
     if (cookie.value.token) {
@@ -84,7 +84,7 @@ export default function useUser(app) {
     const body = {_id: user._id, email: user.email, password: user.password, role: user.role}
     const token = jwt.sign({user: body})
     cookie.value.token = token
-    return {data: {user: body, token}}
+    return {user: body, token}
   });
   app.post('/change-password', async ({body: {email, password, newPassword}}) => {
     const newPasswordHash = await Bun.password.hash(newPassword, {
@@ -130,7 +130,7 @@ export default function useUser(app) {
 </html>
 `,
     });
-    return { data: true }
+    return true
   })
 
   app.post('/reset-password', async ({body: {password, code, email}, cookie}): Promise<any> => {
@@ -148,7 +148,7 @@ export default function useUser(app) {
     const body = {_id: user._id, email: user.email, password: passwordHash};
     const authToken = jwt.sign({user: body});
     cookie.value.token = authToken
-    return {data: {user, token: authToken}}
+    return {user, token: authToken}
   });
 
   /** Users */
@@ -162,7 +162,7 @@ export default function useUser(app) {
     } else {
       throw new Error("Missing :id")
     }
-    return {data: user}
+    return user
   });
   app.put('/update-profile', requireUser, async ({body: {avatar, fullName}}) => {
     const authUser = req.user as IUser;
@@ -172,6 +172,6 @@ export default function useUser(app) {
       PostModel.updateMany({createdBy: authUser._id}, {byUser: _.pick(response, ['_id', 'fullName', 'username', 'avatar'])})
         .then(console.log)
         .catch(console.error)
-    return {data: response}
+    return response
   })
 }

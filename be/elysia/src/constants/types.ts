@@ -1,4 +1,3 @@
-import {Request} from "express";
 import {Types} from "mongoose";
 
 export enum UserRole {
@@ -29,8 +28,4 @@ export interface AuthUser {
   email: string,
   password: string,
   role: UserRole
-}
-
-export interface AuthRequest extends Request {
-  user: AuthUser
 }

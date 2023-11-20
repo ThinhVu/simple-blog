@@ -48,7 +48,7 @@ export const create = async ({
 }
 
 const omitFields = {__v: 0, of: 0, createdBy: 0}
-export const getPosts = async (uid: Types.ObjectId, cid: Types.ObjectId, page = 1): Promise<IPost[]> => {
+export const getPosts = async (uid: Types.ObjectId, cid: Types.ObjectId | undefined, page = 1): Promise<IPost[]> => {
    const NEWS_PER_PAGE = 10
    const matchQry = (
       cid == null
