@@ -1,5 +1,4 @@
 import _ from 'lodash';
-//import {Request} from 'express';
 import User, {IUser} from "./user.model";
 import {
   createUser, getAuthUserByEmail,
