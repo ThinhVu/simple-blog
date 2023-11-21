@@ -7,7 +7,10 @@ export default async function initDb(): Promise<any> {
       useNewUrlParser: true,
       useFindAndModify: false,
       useUnifiedTopology: true,
+<<<<<<< HEAD
       family: 4,
+=======
+>>>>>>> c49986eb039f5ee5e607434fad6695d8a2418eff
     });
     console.log('DB connected');
     return db

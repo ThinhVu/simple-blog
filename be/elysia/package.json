@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "simple-social-network-be",
   "version": "0.0.1",
   "private": true,
@@ -42,3 +43,26 @@
     "typescript": "^4.7.4"
   }
 }
+=======
+  "name": "app",
+  "version": "1.0.50",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "bun run --watch src/index.ts"
+  },
+  "dependencies": {
+    "@elysiajs/bearer": "^0.7.0",
+    "@elysiajs/cors": "^0.7.2",
+    "@elysiajs/jwt": "^0.7.0",
+    "dotenv": "^16.3.1",
+    "elysia": "latest",
+    "lodash": "^4.17.21",
+    "mongoose": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.201",
+    "bun-types": "latest"
+  },
+  "module": "src/index.js"
+}
+>>>>>>> c49986eb039f5ee5e607434fad6695d8a2418eff

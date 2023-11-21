@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 import {Request} from "express";
+=======
+>>>>>>> c49986eb039f5ee5e607434fad6695d8a2418eff
 import {Types} from "mongoose";
 
 export enum UserRole {
@@ -29,8 +32,12 @@ export interface AuthUser {
   email: string,
   password: string,
   role: UserRole
+<<<<<<< HEAD
 }
 
 export interface AuthRequest extends Request {
   user: AuthUser
 }
+=======
+}
+>>>>>>> c49986eb039f5ee5e607434fad6695d8a2418eff

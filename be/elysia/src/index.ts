@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -26,3 +27,19 @@ initDb().then(async () => {
    const httpServer = createServer(app);
    httpServer.listen({port: PORT}, () => console.log(`httpServer ready at http://localhost:${PORT}`));
 })
+=======
+import createApp from './app'
+
+async function main() {
+  const app = await createApp()
+  console.log(
+    `🦊 Elysia is running at http://${app.server?.hostname}:${app.server?.port}`
+  );
+}
+
+main()
+
+
+
+
+>>>>>>> c49986eb039f5ee5e607434fad6695d8a2418eff
