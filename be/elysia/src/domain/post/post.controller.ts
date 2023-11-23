@@ -45,4 +45,5 @@ export default function usePost(app) {
    app.get('/comments/:id', async ({params: {id}, query: {page}}) => {
       return PostBL.getComments(To.objectId(id, 'Post id is invalid'), +page || 1)
    })
+   return app
 }

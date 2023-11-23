@@ -83,4 +83,5 @@ export default function useUser(app) {
         .catch(console.error)
     return response
   })
+  return app
 }

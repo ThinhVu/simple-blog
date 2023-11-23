@@ -40,4 +40,5 @@ export default function useUser(app) {
          id: t.String()
       })
    })
+   return app
 }

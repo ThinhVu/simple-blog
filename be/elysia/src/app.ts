@@ -10,10 +10,9 @@ export default async function createApp() {
   dotenv.config()
   await initDb()
   const app = new Elysia();
-  app
-    .use(cors())
+  app.use(cors())
     .use(swagger())
-    .use(AuthPlugin)
     .use(routers)
+    .use(AuthPlugin)
   return app;
 }
