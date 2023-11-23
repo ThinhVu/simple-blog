@@ -11,7 +11,7 @@ const router = new Router();
 /** Post */
 router.get('/', async (req: Request, res: Response) => {
    try {
-      const {uid, cid, p} = req.query;
+      const {uid, cid, p} = req.query_parameters;
       const posts = await PostBL.getPosts(To.objectId(uid, 'uid is invalid'), cid === '0' ? null : To.objectId(cid, 'cid is invalid'), +p || 1);
       res.send(JSON.stringify({data: posts}))
    } catch (e) {
@@ -20,7 +20,7 @@ router.get('/', async (req: Request, res: Response) => {
 })
 router.get('/:id', async (req: Request, res: Response) => {
    try {
-      const postId = req.params.id
+      const postId = req.path_parameters.id
       const post = await PostBL.getPost(To.objectId(postId));
       res.send(JSON.stringify({data: post}));
    } catch (e) {
@@ -29,7 +29,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 })
 router.post('/', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response) => {
    try {
-      const {categories, type, text, textVi, textEn, audio, photos, videos, tags, of} = req.body;
+      const {categories, type, text, textVi, textEn, audio, photos, videos, tags, of} = await req.json();
       const ofPost = To.objectId(of, null);
       const post = await PostBL.create({
          categories,
@@ -43,7 +43,7 @@ router.post('/', {middlewares: [requireUser]}, async (req: AuthRequest, res: Res
 })
 router.delete('/:id', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response) => {
    try {
-      const postId = req.params.id
+      const postId = req.path_parameters.id
       await PostBL.remove(To.objectId(postId, 'Post id is invalid'), req.user._id);
       res.send(JSON.stringify({data: true}))
    } catch (e) {
@@ -52,8 +52,8 @@ router.delete('/:id', {middlewares: [requireUser]}, async (req: AuthRequest, res
 })
 router.put('/:id', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response) => {
    try {
-      const postId = req.params.id
-      const post = await PostBL.update(To.objectId(postId, 'Post id is invalid'), req.user._id, req.body);
+      const postId = req.path_parameters.id
+      const post = await PostBL.update(To.objectId(postId, 'Post id is invalid'), req.user._id, await req.json());
       res.send(JSON.stringify({data: post}));
    } catch (e) {
       internalError(e, res);
@@ -61,7 +61,7 @@ router.put('/:id', {middlewares: [requireUser]}, async (req: AuthRequest, res: R
 })
 router.put('/react/:id', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response) => {
    try {
-      const postId = req.params.id
+      const postId = req.path_parameters.id
       const {reactType} = req.query
       const rs = await PostBL.react(reactType as PostReactType, To.objectId(postId, 'Post id is invalid'), req.user._id);
       res.send(JSON.stringify({data: rs}))
@@ -71,7 +71,7 @@ router.put('/react/:id', {middlewares: [requireUser]}, async (req: AuthRequest, 
 })
 router.put('/un-react/:id', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response) => {
    try {
-      const postId = req.params.id
+      const postId = req.path_parameters.id
       await PostBL.unReact(To.objectId(postId, 'Post id is invalid'), req.user._id);
       res.send(JSON.stringify({data: true}))
    } catch (e) {
@@ -80,7 +80,7 @@ router.put('/un-react/:id', {middlewares: [requireUser]}, async (req: AuthReques
 })
 router.get('/comments/:id', async (req: Request, res: Response) => {
    try {
-      const postId = req.params.id;
+      const postId = req.path_parameters.id;
       const page = +req.query.page || 1;
       const post = await PostBL.getComments(To.objectId(postId, 'Post id is invalid'), page);
       res.send(JSON.stringify({data: post}));

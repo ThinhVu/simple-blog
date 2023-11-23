@@ -23,18 +23,18 @@ const router = new Router();
 /**
  * Authentication
  */
-router.get('/can-use-email', async (req: AuthRequest, res:Response): Promise<any> => {
+router.post('/can-use-email', async (req: AuthRequest, res:Response): Promise<any> => {
   try {
-    const {email} = req.body;
+    const {email} = await req.json();
     if (!email) {
-      return res.status(400, 'MISSING_FIELD: email');
+      return res.status(400).json({error: 'MISSING_FIELD: email'})
     }
     if (!email.match(EmailRegex)) {
-      return res.status(400,'INVALID_EMAIL_FORMAT');
+      return res.status(400).json({error: 'INVALID_EMAIL_FORMAT'});
     }
 
     if (await isUserWithEmailExisted(email)) {
-      return res.status(400,'EMAIL_HAS_BEEN_USED');
+      return res.status(400).json({error: 'EMAIL_HAS_BEEN_USED'});
     }
     const data = {result: true};
     const jsonData = JSON.stringify(data);
@@ -45,14 +45,14 @@ router.get('/can-use-email', async (req: AuthRequest, res:Response): Promise<any
 });
 router.post('/sign-up', async (req: AuthRequest, res:Response): Promise<any> => {
   try {
-    const {email, password} = req.body;
+    const {email, password} = await req.json();
 
     if (!email || !password) {
-      return res.status(400,'MISSING_FIELD: email or password');
+      return res.status(400).json({error: 'MISSING_FIELD: email or password'});
     }
 
     if (await isUserWithEmailExisted(email)) {
-      return res.status(400,'EMAIL_HAS_BEEN_USED');
+      return res.status(400).json({error: 'EMAIL_HAS_BEEN_USED'});
     }
 
     const username = new Date().getTime().toString();
@@ -66,16 +66,16 @@ router.post('/sign-up', async (req: AuthRequest, res:Response): Promise<any> => 
   }
 });
 router.post('/sign-in', async (req: AuthRequest, res: Response): Promise<any> => {
-  const {email, password} = req.body;
+  const {email, password} = await req.json();
   const user = await User.findOne({email});
 
   if (!user) {
-    return res.status(400, 'USER_WITH_EMAIL_NOT_FOUND');
+    return res.status(400).json({ error: 'USER_WITH_EMAIL_NOT_FOUND'})
   }
 
-  const validate = await await bcrypt.compare(password, user.password);
+  const validate = await bcrypt.compare(password, user.password)
   if (!validate) {
-    return res.status(400).send(JSON.stringify({ error: 'INCORRECT_EMAIL_OR_PASSWORD' }));
+    return res.status(400).json({ error: 'INCORRECT_EMAIL_OR_PASSWORD' })
   }
 
   const body = {_id: user._id, email: user.email, password: user.password, role: user.role}
@@ -103,11 +103,11 @@ router.get('/auth', async (req: AuthRequest, res: Response): Promise<any> => {
 
       // if account password has been changed -> user not found -> token failed to renew -> return error
       if (!user)
-        return res.status(400, 'INVALID_USER')
+        return res.status(400).json({error: 'INVALID_USER'})
     }
 
     if (!user)
-      return res.status(400, 'INVALID_USER')
+      return res.status(400).json({error: 'INVALID_USER'})
 
     const body = {_id: user._id, email: user.email, password: user.password, role: user.role}
     const token = jwt.sign({user: body}, process.env.SECRET, { expiresIn: '7d' });
@@ -118,15 +118,15 @@ router.get('/auth', async (req: AuthRequest, res: Response): Promise<any> => {
 });
 router.post('/change-password', async (req: AuthRequest, res: Response): Promise<any> => {
   try {
-    const {email, password, newPassword} = req.body;
+    const {email, password, newPassword} = await req.json();
     const newPasswordHash = await bcrypt.hash(newPassword, 10);
     const user = await User.findOne({email});
     if (!user) {
-      return res.status(400, 'INCORRECT_EMAIL_OR_PASSWORD');
+      return res.status(400).json({error: 'INCORRECT_EMAIL_OR_PASSWORD'});
     }
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
-      return res.status(400, 'INCORRECT_EMAIL_OR_PASSWORD');
+      return res.status(400).json({error: 'INCORRECT_EMAIL_OR_PASSWORD'});
     }
     await User.updateOne({email}, { password: newPasswordHash });
     res.status(204).end();
@@ -135,11 +135,11 @@ router.post('/change-password', async (req: AuthRequest, res: Response): Promise
   }
 });
 router.post('/forgot-password', async (req: AuthRequest, res: Response): Promise<any> => {
-  const {email} = req.body;
+  const {email} = await req.json();
 
   const user = await getAuthUserByEmail(email);
   if (!user) {
-    return res.status(400,'USER_WITH_EMAIL_NOT_FOUND');
+    return res.status(400).json({error: 'USER_WITH_EMAIL_NOT_FOUND'});
   }
 
   const resetPasswordCode = generateRandomCode(6);
@@ -174,15 +174,15 @@ router.post('/forgot-password', async (req: AuthRequest, res: Response): Promise
 });
 router.post('/reset-password', async (req: AuthRequest, res: Response): Promise<any> => {
   try {
-    const {password, code, email} = req.body;
+    const {password, code, email} = await req.json();
     const user = await getAuthUserByEmail(email);
 
     if (!user) {
-      return res.status(400, 'USER_WITH_EMAIL_NOT_FOUND');
+      return res.status(400).json({error: 'USER_WITH_EMAIL_NOT_FOUND'});
     }
 
     if (user.resetPasswordToken !== code ) {
-      return res.status(400, 'Invalid reset code.');
+      return res.status(400).json({error: 'Invalid reset code.'});
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -203,8 +203,8 @@ router.get('/about/:id', {middlewares: [requireUser]}, async (req: AuthRequest, 
     if (req.params.id === 'me') {
       const authUser = req.user as IUser;
       user = await getUserPublicInfoById(authUser._id);
-    } else if (req.params.id) {
-      user = await getUserPublicInfoById(new Types.ObjectId(req.params.id));
+    } else if (req.path_parameters.id) {
+      user = await getUserPublicInfoById(new Types.ObjectId(req.path_parameters.id));
     } else {
       throw "Missing :id";
     }
@@ -216,7 +216,7 @@ router.get('/about/:id', {middlewares: [requireUser]}, async (req: AuthRequest, 
 });
 router.put('/update-profile', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response): Promise<any> => {
   try {
-    const {avatar, fullName} = req.body;
+    const {avatar, fullName} = await req.json();
     const authUser = req.user as IUser;
     const response = await updateUser(authUser._id, {avatar, fullName});
     const requireRevalidateComputedUser = !_.isEmpty(avatar) || !_.isEmpty(fullName)

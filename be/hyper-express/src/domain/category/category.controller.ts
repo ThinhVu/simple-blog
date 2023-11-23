@@ -8,18 +8,18 @@ import {Response} from "hyper-express";
 
 const router = new Router()
 
-router.get('/:id', async (req: AuthRequest, res: Response) => {
+router.post('/', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response) => {
    try {
-      const resp = await CategoryBL.getCategories(new Types.ObjectId(req.params.id))
+      const {name, tags} = await req.json()
+      const resp = await CategoryBL.create(req.user._id, {name, tags})
       res.json(resp)
    } catch (e) {
       internalError(e, res)
    }
 })
-router.post('/', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response) => {
+router.get('/:id', async (req: AuthRequest, res: Response) => {
    try {
-      const {name, tags} = req.body
-      const resp = await CategoryBL.create(req.user._id, {name, tags})
+      const resp = await CategoryBL.getCategories(new Types.ObjectId(req.path_parameters.id))
       res.json(resp)
    } catch (e) {
       internalError(e, res)
@@ -27,7 +27,7 @@ router.post('/', {middlewares: [requireUser]}, async (req: AuthRequest, res: Res
 })
 router.put('/:id', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response) => {
    try {
-      const resp = await CategoryBL.update(req.user._id, new Types.ObjectId(req.params.id), req.body)
+      const resp = await CategoryBL.update(req.user._id, new Types.ObjectId(req.path_parameters.id), await req.json())
       res.json(resp)
    } catch (e) {
       internalError(e, res)
@@ -35,7 +35,7 @@ router.put('/:id', {middlewares: [requireUser]}, async (req: AuthRequest, res: R
 })
 router.delete('/:id', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response) => {
    try {
-      const resp = await CategoryBL.remove(req.user._id, new Types.ObjectId(req.params.id) )
+      const resp = await CategoryBL.remove(req.user._id, new Types.ObjectId(req.path_parameters.id) )
       res.json(resp)
    } catch (e) {
       internalError(e, res)
