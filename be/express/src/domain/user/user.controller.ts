@@ -195,7 +195,7 @@ router.post('/reset-password', async (req: AuthRequest, res): Promise<any> => {
 });
 
 /** Users */
-router.get('/about/:id', requireUser, async (req: Request, res): Promise<any> => {
+router.get('/about/:id', requireUser, async (req: AuthRequest, res): Promise<any> => {
   try {
     let user;
     if (req.params.id === 'me') {
@@ -212,7 +212,7 @@ router.get('/about/:id', requireUser, async (req: Request, res): Promise<any> =>
     internalError(e, res);
   }
 });
-router.put('/update-profile', requireUser, async (req: Request, res): Promise<any> => {
+router.put('/update-profile', requireUser, async (req: AuthRequest, res): Promise<any> => {
   try {
     const {avatar, fullName} = req.body;
     const authUser = req.user as IUser;
