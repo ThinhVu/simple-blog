@@ -14,7 +14,7 @@ const PostSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: 'Post'
    },
-   type: {type: PostType},
+   type: {type: String},
    text: String,
    textVi: String,
    textEn: String,

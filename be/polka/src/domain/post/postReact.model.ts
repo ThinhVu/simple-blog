@@ -2,7 +2,7 @@ import mongoose, {Schema, Types} from 'mongoose';
 import {PostReactType} from "../../constants/types";
 
 const PostReactSchema = new Schema({
-   type: {type: PostReactType},
+   type: {type: String},
    of: {
       type: Schema.Types.ObjectId,
       ref: 'User'
