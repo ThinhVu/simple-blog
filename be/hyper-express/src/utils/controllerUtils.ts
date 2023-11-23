@@ -1,6 +1,6 @@
-//import {Response} from 'express'
-import {Response} from 'hyper-express/types/components/http/Response';
-export const internalError = (e: string, res: Response) => {
+import {Response} from 'hyper-express';
+
+export const internalError = (e: Error | string, res: Response) => {
    console.error(e)
-   res.status(500, e)
+   res.status(500, typeof(e) === 'string' ? e : e.message).end()
 }

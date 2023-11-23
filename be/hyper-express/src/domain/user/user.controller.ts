@@ -1,5 +1,4 @@
 import _ from 'lodash';
-//import {Request} from 'express';
 import {Response} from 'hyper-express';
 import User, {IUser} from "./user.model";
 import {
@@ -17,9 +16,7 @@ import {generateRandomCode} from "../../utils/commonUtils";
 import {sendEmail} from "../../utils/email";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-//import express from "express";
 import {Router} from 'hyper-express';
-//import {json} from "express";
 
 const router = new Router();
 
@@ -96,7 +93,7 @@ router.post('/sign-out', async (req: AuthRequest, res): Promise<any> => {
 router.get('/auth', async (req: AuthRequest, res: Response): Promise<any> => {
   try {
     const jwtToken = req.headers.authorization.split(' ')[1];
-    const decoded = jwt.decode(jwtToken, process.env.SECRET);
+    const decoded = jwt.verify(jwtToken, process.env.SECRET) as {exp: number, user: IUser};
     const expired = Date.now() > decoded.exp * 1000;
     let user = decoded.user;
 
@@ -200,7 +197,7 @@ router.post('/reset-password', async (req: AuthRequest, res: Response): Promise<
 });
 
 /** Users */
-router.get('/about/:id', requireUser, async (req: AuthRequest, res: Response): Promise<any> => {
+router.get('/about/:id', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response): Promise<any> => {
   try {
     let user;
     if (req.params.id === 'me') {
@@ -217,7 +214,7 @@ router.get('/about/:id', requireUser, async (req: AuthRequest, res: Response): P
     internalError(e, res);
   }
 });
-router.put('/update-profile', requireUser, async (req: AuthRequest, res: Response): Promise<any> => {
+router.put('/update-profile', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response): Promise<any> => {
   try {
     const {avatar, fullName} = req.body;
     const authUser = req.user as IUser;

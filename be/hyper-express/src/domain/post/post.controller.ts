@@ -2,10 +2,9 @@ import {internalError} from '../../utils/controllerUtils';
 import * as PostBL from './post.service';
 import {AuthRequest, PostReactType} from "../../constants/types";
 import {requireUser} from "../../middlewares/protected-route";
-//import express from "express";
 import To from "../../utils/data-parser";
 import {Router} from 'hyper-express';
-import {Request,Response} from "hyper-express";
+import {Request, Response} from "hyper-express";
 
 const router = new Router();
 
@@ -28,7 +27,7 @@ router.get('/:id', async (req: Request, res: Response) => {
       internalError(e, res);
    }
 })
-router.post('/', requireUser, async (req: AuthRequest, res: Response) => {
+router.post('/', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response) => {
    try {
       const {categories, type, text, textVi, textEn, audio, photos, videos, tags, of} = req.body;
       const ofPost = To.objectId(of, null);
@@ -42,7 +41,7 @@ router.post('/', requireUser, async (req: AuthRequest, res: Response) => {
       internalError(e, res)
    }
 })
-router.delete('/:id', requireUser, async (req: AuthRequest, res: Response) => {
+router.delete('/:id', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response) => {
    try {
       const postId = req.params.id
       await PostBL.remove(To.objectId(postId, 'Post id is invalid'), req.user._id);
@@ -51,7 +50,7 @@ router.delete('/:id', requireUser, async (req: AuthRequest, res: Response) => {
       internalError(e, res)
    }
 })
-router.put('/:id', requireUser, async (req: AuthRequest, res: Response) => {
+router.put('/:id', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response) => {
    try {
       const postId = req.params.id
       const post = await PostBL.update(To.objectId(postId, 'Post id is invalid'), req.user._id, req.body);
@@ -60,7 +59,7 @@ router.put('/:id', requireUser, async (req: AuthRequest, res: Response) => {
       internalError(e, res);
    }
 })
-router.put('/react/:id', requireUser, async (req: AuthRequest, res: Response) => {
+router.put('/react/:id', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response) => {
    try {
       const postId = req.params.id
       const {reactType} = req.query
@@ -70,7 +69,7 @@ router.put('/react/:id', requireUser, async (req: AuthRequest, res: Response) =>
       internalError(e, res)
    }
 })
-router.put('/un-react/:id', requireUser, async (req: AuthRequest, res: Response) => {
+router.put('/un-react/:id', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response) => {
    try {
       const postId = req.params.id
       await PostBL.unReact(To.objectId(postId, 'Post id is invalid'), req.user._id);
