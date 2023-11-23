@@ -21,24 +21,6 @@ const router = express.Router()
 /**
  * Authentication
  */
-router.get('/can-use-email', mongoCtx(async (req: any, res: any): Promise<any> => {
-  try {
-    const {email} = req.query as {email: string};
-    if (!email) {
-      return res.status(400).send({error: 'MISSING_FIELD: email'});
-    }
-    if (!email.match(EmailRegex)) {
-      return res.status(400).send({error: 'INVALID_EMAIL_FORMAT'});
-    }
-
-    if (await isUserWithEmailExisted(email)) {
-      return res.status(400).send({error: 'EMAIL_HAS_BEEN_USED'});
-    }
-    return res.send({data: {result: true}});
-  } catch (e: any) {
-    internalError(e, res);
-  }
-}));
 router.post('/sign-up', mongoCtx(async (req: any, res: any): Promise<any> => {
   try {
     const {email, password} = req.body;
@@ -113,81 +95,6 @@ router.get('/auth', mongoCtx(async (req: any, res: any): Promise<any> => {
     internalError(e, res);
   }
 }));
-router.post('/change-password', mongoCtx(async (req: any, res: any): Promise<any> => {
-  try {
-    const {email, password, newPassword} = req.body;
-    const user = await Model('User').findOne({email, password});
-    if (!user) {
-      return res.status(400).send({error: 'INCORRECT_EMAIL_OR_PASSWORD'});
-    }
-    await Model('User').updateOne({email}, { password: newPassword });
-    res.status(204).end();
-  } catch (e: any) {
-    internalError(e, res);
-  }
-}));
-router.post('/forgot-password', mongoCtx(async (req: any, res: any): Promise<any> => {
-  const {email} = req.body;
-
-  const user = await getAuthUserByEmail(email);
-  if (!user) {
-    return res.status(400).send({error: 'USER_WITH_EMAIL_NOT_FOUND'});
-  }
-
-  const resetPasswordCode = generateRandomCode(6);
-  await updateUserResetPasswordToken(user._id, resetPasswordCode);
-
-  const greeting = `Hey "${user.fullName || user.email}"`;
-  const description = `We received a request to reset your password. The reset password code is "${resetPasswordCode}".\r\nIf you do not make this request, you can safely ignore this message.`;
-
-  try {
-    await sendEmail({
-      to: email,
-      subject: 'Reset Password Request',
-      html: `
-<!doctype html>
-<html>
-   <head>
-      <meta name="viewport" content="width=device-width">
-   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-   <title>Reset password code</title>
-   </head>
-   <body>
-    <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px; Margin-top: 20px;">${greeting},</p>
-    <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">${description}</p>
-    </body>
-</html>
-`,
-    });
-    return res.send({ data: true });
-  } catch (e: any) {
-    internalError(e, res);
-  }
-}));
-router.post('/reset-password', mongoCtx(async (req: any, res: any): Promise<any> => {
-  try {
-    const {password, code, email} = req.body;
-    const user = await getAuthUserByEmail(email);
-
-    if (!user) {
-      return res.status(400).send({error: 'USER_WITH_EMAIL_NOT_FOUND' });
-    }
-
-    if (user.resetPasswordToken !== code ) {
-      return res.status(400).send({ error: 'Invalid reset code.' });
-    }
-
-    await updatePassword(user._id, password);
-
-    const body = {_id: user._id, email: user.email, password};
-    // @ts-ignore
-    const authToken = jwt.sign({user: body}, process.env.SECRET);
-    return res.cookie('token', authToken).send({data: {user, token: authToken}});
-  } catch (e: any) {
-    internalError(e, res);
-  }
-}));
-
 /** Users */
 router.get('/about/:id', requireUser, mongoCtx(async (req: Request, res: any): Promise<any> => {
   try {

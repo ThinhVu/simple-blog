@@ -2,18 +2,15 @@ import _ from 'lodash';
 import {Response} from 'hyper-express';
 import User, {IUser} from "./user.model";
 import {
-  createUser, getAuthUserByEmail,
-  getUserPublicInfoById, isUserWithEmailExisted, updatePassword,
-  updateUser, updateUserResetPasswordToken
+  createUser,
+  getUserPublicInfoById, isUserWithEmailExisted,
+  updateUser
 } from './user.service';
 import {internalError} from "../../utils/controllerUtils";
 import PostModel from '../post/post.model';
 import {Types} from "mongoose";
 import {requireUser} from "../../middlewares/protected-route";
 import {AuthRequest, AuthUser} from "../../constants/types";
-import {EmailRegex} from "../../constants/regex";
-import {generateRandomCode} from "../../utils/commonUtils";
-import {sendEmail} from "../../utils/email";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {Router} from 'hyper-express';
@@ -23,26 +20,6 @@ const router = new Router();
 /**
  * Authentication
  */
-router.post('/can-use-email', async (req: AuthRequest, res:Response): Promise<any> => {
-  try {
-    const {email} = await req.json();
-    if (!email) {
-      return res.status(400).json({error: 'MISSING_FIELD: email'})
-    }
-    if (!email.match(EmailRegex)) {
-      return res.status(400).json({error: 'INVALID_EMAIL_FORMAT'});
-    }
-
-    if (await isUserWithEmailExisted(email)) {
-      return res.status(400).json({error: 'EMAIL_HAS_BEEN_USED'});
-    }
-    const data = {result: true};
-    const jsonData = JSON.stringify(data);
-    return res.send(jsonData);
-  } catch (e) {
-    internalError(e, res);
-  }
-});
 router.post('/sign-up', async (req: AuthRequest, res:Response): Promise<any> => {
   try {
     const {email, password} = await req.json();
@@ -116,86 +93,6 @@ router.get('/auth', async (req: AuthRequest, res: Response): Promise<any> => {
     internalError(e, res);
   }
 });
-router.post('/change-password', async (req: AuthRequest, res: Response): Promise<any> => {
-  try {
-    const {email, password, newPassword} = await req.json();
-    const newPasswordHash = await bcrypt.hash(newPassword, 10);
-    const user = await User.findOne({email});
-    if (!user) {
-      return res.status(400).json({error: 'INCORRECT_EMAIL_OR_PASSWORD'});
-    }
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
-      return res.status(400).json({error: 'INCORRECT_EMAIL_OR_PASSWORD'});
-    }
-    await User.updateOne({email}, { password: newPasswordHash });
-    res.status(204).end();
-  } catch (e) {
-    internalError(e, res);
-  }
-});
-router.post('/forgot-password', async (req: AuthRequest, res: Response): Promise<any> => {
-  const {email} = await req.json();
-
-  const user = await getAuthUserByEmail(email);
-  if (!user) {
-    return res.status(400).json({error: 'USER_WITH_EMAIL_NOT_FOUND'});
-  }
-
-  const resetPasswordCode = generateRandomCode(6);
-  await updateUserResetPasswordToken(user._id, resetPasswordCode);
-
-  const greeting = `Hey "${user.fullName || user.email}"`;
-  const description = `We received a request to reset your password. The reset password code is "${resetPasswordCode}".\r\nIf you do not make this request, you can safely ignore this message.`;
-
-  try {
-    await sendEmail({
-      to: email,
-      subject: 'Reset Password Request',
-      html: `
-<!doctype html>
-<html>
-   <head>
-      <meta name="viewport" content="width=device-width">
-   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-   <title>Reset password code</title>
-   </head>
-   <body>
-    <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px; Margin-top: 20px;">${greeting},</p>
-    <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">${description}</p>
-    </body>
-</html>
-`,
-    });
-    return res.send(JSON.stringify({ data: true }));
-  } catch (e) {
-    internalError(e, res);
-  }
-});
-router.post('/reset-password', async (req: AuthRequest, res: Response): Promise<any> => {
-  try {
-    const {password, code, email} = await req.json();
-    const user = await getAuthUserByEmail(email);
-
-    if (!user) {
-      return res.status(400).json({error: 'USER_WITH_EMAIL_NOT_FOUND'});
-    }
-
-    if (user.resetPasswordToken !== code ) {
-      return res.status(400).json({error: 'Invalid reset code.'});
-    }
-
-    const passwordHash = await bcrypt.hash(password, 10);
-    await updatePassword(user._id, passwordHash);
-
-    const body = {_id: user._id, email: user.email, password: passwordHash};
-    const authToken = jwt.sign({user: body}, process.env.SECRET);
-    return res.cookie('token', authToken).send(JSON.stringify({data: {user, token: authToken}}));
-  } catch (e) {
-    internalError(e, res);
-  }
-});
-
 /** Users */
 router.get('/about/:id', {middlewares: [requireUser]}, async (req: AuthRequest, res: Response): Promise<any> => {
   try {
