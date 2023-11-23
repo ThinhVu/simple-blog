@@ -7,24 +7,13 @@ import {
 } from './user.service';
 import PostModel from '../post/post.model';
 import {Types} from "mongoose";
-import {requireUser} from "../../middlewares/protected-route";
 import {AuthUser} from "../../constants/types";
 import {EmailRegex} from "../../constants/regex";
 import {generateRandomCode} from "../../utils/commonUtils";
 import {sendEmail} from "../../utils/email";
-import { jwt } from '@elysiajs/jwt';
-import { bearer } from '@elysiajs/bearer'
 import {Elysia, t} from "elysia";
 
-export default function useUser(app) {
-  app.use(jwt({
-    name: 'jwt',
-    exp: '7d',
-    secret: process.env.SECRET || ''
-  }))
-
-  app.use(bearer())
-
+export default function useUser(app: Elysia) {
   /**
    * Authentication
    */
@@ -33,7 +22,11 @@ export default function useUser(app) {
     if (!email.match(EmailRegex)) throw new Error('INVALID_EMAIL_FORMAT')
     if (await isUserWithEmailExisted(email)) throw new Error('EMAIL_HAS_BEEN_USED')
     return {result: true}
-  });
+  }, {
+    body: t.Object({
+      email: t.String()
+    })
+  })
 
   app.post('/sign-up', async ({jwt, body: {email, password}, cookie}) => {
     if (!email || !password) throw new Error('MISSING_FIELD: email or password')
@@ -152,10 +145,10 @@ export default function useUser(app) {
   });
 
   /** Users */
-  app.get('/about/:id', requireUser, async ({params: {id}}) => {
+  app.get('/about/:id', async ({params: {id}, getUser}) => {
     let user
     if (id === 'me') {
-      const authUser = req.user as IUser
+      const authUser = getUser() as IUser
       user = await getUserPublicInfoById(authUser._id)
     } else if (id) {
       user = await getUserPublicInfoById(new Types.ObjectId(id))
@@ -164,8 +157,8 @@ export default function useUser(app) {
     }
     return user
   });
-  app.put('/update-profile', requireUser, async ({body: {avatar, fullName}}) => {
-    const authUser = req.user as IUser;
+  app.put('/update-profile', async ({body: {avatar, fullName}, getUser}) => {
+    const authUser = getUser() as IUser;
     const response = await updateUser(authUser._id, {avatar, fullName});
     const requireRevalidateComputedUser = !_.isEmpty(avatar) || !_.isEmpty(fullName)
     if (requireRevalidateComputedUser)
