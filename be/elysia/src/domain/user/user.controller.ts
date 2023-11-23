@@ -21,7 +21,7 @@ export default function useUser(app) {
     })
     const user = await createUser({username, email, password: hashPassword, createdAt: new Date()});
     const authUser : AuthUser = {_id: user._id, email: user.email, password: user.password, role: user.role}
-    const token = jwt.sign({user: authUser});
+    const token = await jwt.sign({user: authUser});
     cookie.value.token = token;
     return {user, token}
   })
@@ -36,7 +36,7 @@ export default function useUser(app) {
     if (!validate) throw new Error('INCORRECT_EMAIL_OR_PASSWORD')
 
     const body = {_id: user._id, email: user.email, password: user.password, role: user.role}
-    const token = jwt.sign({user: body})
+    const token = await jwt.sign({user: body})
 
     cookie.value.token = token
 
@@ -56,7 +56,7 @@ export default function useUser(app) {
     if (expired) throw new Error('EXPIRED')
     if (!user) throw new Error('INVALID_USER')
     const body = {_id: user._id, email: user.email, password: user.password, role: user.role}
-    const token = jwt.sign({user: body})
+    const token = await jwt.sign({user: body})
     cookie.value.token = token
     return {user: body, token}
   });
