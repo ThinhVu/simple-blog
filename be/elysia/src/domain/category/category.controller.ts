@@ -1,7 +1,7 @@
 import * as CategoryBL from "./category.service";
 import {Types} from "mongoose";
-import {requireUser} from "../../middlewares/protected-route";
 import {t} from 'elysia'
+import {IUser} from "../user/user.model";
 
 export default function useUser(app) {
    app.get('/:id', async ({params: {id}}) => {
@@ -12,8 +12,9 @@ export default function useUser(app) {
       })
    })
 
-   app.post('/', requireUser, async ({body: {name, tags}}) => {
-      return CategoryBL.create(req.user._id, {name, tags})
+   app.post('/', async ({getAuthUser, body: {name, tags}}) => {
+      const user = getAuthUser() as IUser;
+      return CategoryBL.create(user._id, {name, tags})
    }, {
       body: t.Object({
          name: t.String(),
@@ -22,17 +23,18 @@ export default function useUser(app) {
       type: 'json'
    })
 
-   app.put('/:id', requireUser, async ({params: {id}, body}) => {
-      return CategoryBL.update(req.user._id, new Types.ObjectId(id), body)
+   app.put('/:id', async ({getAuthUser, params: {id}, body}) => {
+      const user = getAuthUser() as IUser;
+      return CategoryBL.update(user._id, new Types.ObjectId(id), body)
    }, {
       params: t.Object({
          id: t.String()
-      }),
-      type: 'json'
+      })
    })
 
-   app.delete('/:id', requireUser, async ({params: {id}}) => {
-      return CategoryBL.remove(req.user._id, new Types.ObjectId(id) )
+   app.delete('/:id', async ({getAuthUser, params: {id}}) => {
+      const user = getAuthUser() as IUser
+      return CategoryBL.remove(user._id, new Types.ObjectId(id) )
    }, {
       params: t.Object({
          id: t.String()

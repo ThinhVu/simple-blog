@@ -1,18 +1,16 @@
 import _ from 'lodash';
 import User, {IUser} from "./user.model";
 import {
-  createUser, getAuthUserByEmail,
-  getUserPublicInfoById, isUserWithEmailExisted, updatePassword,
-  updateUser, updateUserResetPasswordToken
+  createUser,
+  getUserPublicInfoById, isUserWithEmailExisted,
+  updateUser
 } from './user.service';
 import PostModel from '../post/post.model';
 import {Types} from "mongoose";
 import {AuthUser} from "../../constants/types";
-import {generateRandomCode} from "../../utils/commonUtils";
-import {sendEmail} from "../../utils/email";
 import {Elysia, t} from "elysia";
 
-export default function useUser(app: Elysia) {
+export default function useUser(app) {
   app.post('/sign-up', async ({jwt, body: {email, password}, cookie}) => {
     if (!email || !password) throw new Error('MISSING_FIELD: email or password')
     if (await isUserWithEmailExisted(email)) throw new Error('EMAIL_HAS_BEEN_USED')
@@ -63,10 +61,10 @@ export default function useUser(app: Elysia) {
     return {user: body, token}
   });
   /** Users */
-  app.get('/about/:id', async ({params: {id}, getUser}) => {
+  app.get('/about/:id', async ({params: {id}, getAuthUser}) => {
     let user
     if (id === 'me') {
-      const authUser = getUser() as IUser
+      const authUser = getAuthUser() as IUser
       user = await getUserPublicInfoById(authUser._id)
     } else if (id) {
       user = await getUserPublicInfoById(new Types.ObjectId(id))
@@ -75,8 +73,8 @@ export default function useUser(app: Elysia) {
     }
     return user
   });
-  app.put('/update-profile', async ({body: {avatar, fullName}, getUser}) => {
-    const authUser = getUser() as IUser;
+  app.put('/update-profile', async ({body: {avatar, fullName}, getAuthUser}) => {
+    const authUser = getAuthUser() as IUser;
     const response = await updateUser(authUser._id, {avatar, fullName});
     const requireRevalidateComputedUser = !_.isEmpty(avatar) || !_.isEmpty(fullName)
     if (requireRevalidateComputedUser)

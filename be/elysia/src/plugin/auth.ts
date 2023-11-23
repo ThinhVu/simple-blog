@@ -1,4 +1,4 @@
-import {Elysia, type Context} from 'elysia';
+import {Elysia} from 'elysia';
 import {jwt} from "@elysiajs/jwt";
 import {bearer} from "@elysiajs/bearer";
 
@@ -11,7 +11,7 @@ const plugin = new Elysia()
   .use(bearer())
   .derive(({bearer, jwt}) => {
     return {
-      getUser: () => {
+      getAuthUser: () => {
         if (!bearer) throw 'INVALID_USER'
         const {user, exp} = jwt.decode(bearer);
         const expired = Date.now() > exp * 1000;
