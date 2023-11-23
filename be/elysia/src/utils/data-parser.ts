@@ -4,14 +4,14 @@ import dayjs from "dayjs";
 /**
  * Parse any value to Types.ObjectId
  * @param v input value
- * @param throwIfInvalid if true, an Error will be thrown. Otherwise, null will be returned.
+ * @param errorMessage if true, an Error will be thrown. Otherwise, null will be returned.
  */
-const objectId = (v: any, errorMessage = 'Invalid object id'): Types.ObjectId => {
+const objectId = (v: any, errorMessage = 'Invalid object id'): Types.ObjectId | undefined => {
    if (!v) {
       if (errorMessage)
          throw new Error(errorMessage)
       else
-         return null;
+         return
    }
    return new Types.ObjectId(v)
 }
