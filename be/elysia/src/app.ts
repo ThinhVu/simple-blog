@@ -12,7 +12,10 @@ export default async function createApp() {
   const app = new Elysia();
   app.use(cors())
     .use(swagger())
-    .use(routers)
     .use(AuthPlugin)
+    .use(routers)
+    .onError((e: any) => {
+      console.error(e)
+    })
   return app;
 }
