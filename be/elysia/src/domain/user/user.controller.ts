@@ -48,13 +48,8 @@ export default function useUser(app) {
     }
     return {data: {result: true}}
   })
-  app.get('/auth', async ({jwt, request, cookie}) => {
-    const jwtToken = request.headers.authorization.split(' ')[1];
-    const decoded = jwt.verify(jwtToken);
-    const expired = Date.now() > decoded.exp * 1000;
-    let user = decoded.user;
-    if (expired) throw new Error('EXPIRED')
-    if (!user) throw new Error('INVALID_USER')
+  app.get('/auth', async ({getAuthUser, jwt, cookie}) => {
+    const user = getAuthUser() as IUser;
     const body = {_id: user._id, email: user.email, password: user.password, role: user.role}
     const token = await jwt.sign({user: body})
     cookie.value.token = token
