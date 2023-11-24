@@ -49,7 +49,7 @@ export default function useUser(app) {
     return true
   })
   app.get('/auth', async ({getAuthUser, jwt, cookie}) => {
-    const user = getAuthUser() as IUser;
+    const user = await getAuthUser() as IUser;
     const body = {_id: user._id, email: user.email, password: user.password, role: user.role}
     const token = await jwt.sign({user: body})
     cookie.value.token = token
@@ -59,7 +59,7 @@ export default function useUser(app) {
   app.get('/about/:id', async ({params: {id}, getAuthUser}) => {
     let user
     if (id === 'me') {
-      const authUser = getAuthUser() as IUser
+      const authUser = await getAuthUser() as IUser
       user = await getUserPublicInfoById(authUser._id)
     } else if (id) {
       user = await getUserPublicInfoById(new Types.ObjectId(id))
@@ -69,7 +69,7 @@ export default function useUser(app) {
     return user
   });
   app.put('/update-profile', async ({body: {avatar, fullName}, getAuthUser}) => {
-    const authUser = getAuthUser() as IUser;
+    const authUser = await getAuthUser() as IUser;
     const response = await updateUser(authUser._id, {avatar, fullName});
     const requireRevalidateComputedUser = !_.isEmpty(avatar) || !_.isEmpty(fullName)
     if (requireRevalidateComputedUser)

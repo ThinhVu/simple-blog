@@ -13,7 +13,7 @@ export default function useUser(app) {
    })
 
    app.post('/', async ({getAuthUser, body: {name, tags}}) => {
-      const user = getAuthUser() as IUser;
+      const user = await getAuthUser() as IUser;
       return CategoryBL.create(user._id, {name, tags})
    }, {
       body: t.Object({
@@ -24,7 +24,7 @@ export default function useUser(app) {
    })
 
    app.put('/:id', async ({getAuthUser, params: {id}, body}) => {
-      const user = getAuthUser() as IUser;
+      const user = await getAuthUser() as IUser;
       return CategoryBL.update(user._id, new Types.ObjectId(id), body)
    }, {
       params: t.Object({
@@ -33,7 +33,7 @@ export default function useUser(app) {
    })
 
    app.delete('/:id', async ({getAuthUser, params: {id}}) => {
-      const user = getAuthUser() as IUser
+      const user = await getAuthUser() as IUser
       return CategoryBL.remove(user._id, new Types.ObjectId(id) )
    }, {
       params: t.Object({

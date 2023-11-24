@@ -16,7 +16,7 @@ export default function usePost(app) {
       return PostBL.getPost(To.objectId(id));
    })
    app.post('/', async ({getAuthUser, body}) => {
-      const user = getAuthUser() as IUser
+      const user = await getAuthUser() as IUser
       const {categories, type, text, textVi, textEn, audio, photos, videos, tags, of} = body;
       const ofPost = To.objectId(of, undefined);
       const post = await PostBL.create({
@@ -27,19 +27,19 @@ export default function usePost(app) {
       return post
    })
    app.delete('/:id', async ({getAuthUser, params: {id}}) => {
-      const user = getAuthUser() as IUser
+      const user = await getAuthUser() as IUser
       return PostBL.remove(To.objectId(id, 'Post id is invalid'), user._id)
    })
    app.put('/:id', async ({getAuthUser, params: {id}, body}) => {
-      const user = getAuthUser() as IUser
+      const user = await getAuthUser() as IUser
       return PostBL.update(To.objectId(id, 'Post id is invalid'), user._id, body)
    })
    app.put('/react/:id', async ({getAuthUser, params: {id}, query: {reactType}}) => {
-      const user = getAuthUser() as IUser
+      const user = await getAuthUser() as IUser
       return PostBL.react(reactType as PostReactType, To.objectId(id, 'Post id is invalid'), user._id)
    })
    app.put('/un-react/:id', async ({getAuthUser, params: {id}}) => {
-      const user = getAuthUser() as IUser
+      const user = await getAuthUser() as IUser
       return PostBL.unReact(To.objectId(id, 'Post id is invalid'), user._id)
    })
    app.get('/comments/:id', async ({params: {id}, query: {page}}) => {

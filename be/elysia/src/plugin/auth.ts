@@ -11,10 +11,10 @@ const plugin = new Elysia()
   .use(bearer())
   .derive(({bearer, jwt}) => {
     return {
-      getAuthUser: () => {
+      getAuthUser: async () => {
         if (!bearer) throw 'INVALID_USER'
         // @ts-ignore
-        const {user} = jwt.verify(bearer);
+        const {user} = await jwt.verify(bearer);
         if (!user) throw 'INVALID_USER'
         return user
       }
