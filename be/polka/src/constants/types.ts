@@ -1,6 +1,4 @@
-//import {Request} from "express";
 import {Types} from "mongoose";
-import {Request} from "polka";
 export enum UserRole {
   Regular = 'Regular',
   Admin = 'Admin'
@@ -29,9 +27,4 @@ export interface AuthUser {
   email: string,
   password: string,
   role: UserRole
-}
-
-export interface AuthRequest extends Request {
-  user: AuthUser,
-  //body: { [key: string]: any }
 }

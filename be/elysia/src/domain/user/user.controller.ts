@@ -46,7 +46,7 @@ export default function useUser(app) {
     if (cookie.value.token) {
       cookie.value.token = ''
     }
-    return {data: {result: true}}
+    return true
   })
   app.get('/auth', async ({getAuthUser, jwt, cookie}) => {
     const user = getAuthUser() as IUser;

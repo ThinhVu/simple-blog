@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
    try {
       const {uid, cid, p} = req.query;
       const posts = await PostBL.getPosts(To.objectId(uid, 'uid is invalid'), cid === '0' ? null : To.objectId(cid, 'cid is invalid'), +p || 1);
-      res.send({data: posts})
+      res.send(posts)
    } catch (e) {
       internalError(e, res)
    }
@@ -21,7 +21,7 @@ router.get('/:id', async (req, res) => {
    try {
       const postId = req.params.id
       const post = await PostBL.getPost(To.objectId(postId));
-      res.send({data: post});
+      res.send(post);
    } catch (e) {
       internalError(e, res);
    }
@@ -35,7 +35,7 @@ router.post('/', requireUser, async (req: AuthRequest, res) => {
          type, text, textVi, textEn, audio, photos, videos, tags,
          createdBy: req.user._id, of: ofPost
       })
-      res.send({data: post})
+      res.send(post)
    } catch (e) {
       internalError(e, res)
    }
@@ -44,7 +44,7 @@ router.delete('/:id', requireUser, async (req: AuthRequest, res) => {
    try {
       const postId = req.params.id
       await PostBL.remove(To.objectId(postId, 'Post id is invalid'), req.user._id);
-      res.send({data: true})
+      res.send(true)
    } catch (e) {
       internalError(e, res)
    }
@@ -53,7 +53,7 @@ router.put('/:id', requireUser, async (req: AuthRequest, res) => {
    try {
       const postId = req.params.id
       const post = await PostBL.update(To.objectId(postId, 'Post id is invalid'), req.user._id, req.body);
-      res.send({data: post});
+      res.send(post);
    } catch (e) {
       internalError(e, res);
    }
@@ -63,7 +63,7 @@ router.put('/react/:id', requireUser, async (req: AuthRequest, res) => {
       const postId = req.params.id
       const {reactType} = req.query
       const rs = await PostBL.react(reactType as PostReactType, To.objectId(postId, 'Post id is invalid'), req.user._id);
-      res.send({data: rs})
+      res.send(rs)
    } catch (e) {
       internalError(e, res)
    }
@@ -72,7 +72,7 @@ router.put('/un-react/:id', requireUser, async (req: AuthRequest, res) => {
    try {
       const postId = req.params.id
       await PostBL.unReact(To.objectId(postId, 'Post id is invalid'), req.user._id);
-      res.send({data: true})
+      res.send(true)
    } catch (e) {
       internalError(e, res)
    }
@@ -82,7 +82,7 @@ router.get('/comments/:id', async (req, res) => {
       const postId = req.params.id;
       const page = +req.query.page || 1;
       const post = await PostBL.getComments(To.objectId(postId, 'Post id is invalid'), page);
-      res.send({data: post});
+      res.send(post);
    } catch (e) {
       internalError(e, res);
    }

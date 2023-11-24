@@ -15,7 +15,7 @@ router.get('/', mongoCtx(async (req: any, res: any) => {
       if (!uid) throw 'uid is invalid'
       if (!cid) throw 'cid is invalid'
       const posts = await getPosts(new ObjectId(uid), cid === '0' ? undefined : new ObjectId(cid), +p || 1);
-      res.send({data: posts})
+      res.json(posts)
    } catch (e: any) {
       internalError(e, res)
    }
@@ -25,7 +25,7 @@ router.get('/:id', mongoCtx(async (req: any, res: any) => {
       const postId = req.params.id
       if (!postId) throw 'id is missing'
       const post = await getPost(postId);
-      res.send({data: post});
+      res.json(post);
    } catch (e: any) {
       internalError(e, res);
    }
@@ -41,7 +41,7 @@ router.post('/', requireUser, mongoCtx(async (req: any, res: any) => {
          type, text, textVi, textEn, audio, photos, videos, tags,
          createdBy: uid, of: ofPost
       })
-      res.send({data: post})
+      res.json(post)
    } catch (e: any) {
       internalError(e, res)
    }
@@ -54,7 +54,7 @@ router.delete('/:id', requireUser, mongoCtx(async (req: any, res: any) => {
       // @ts-ignore
       const uid = req.user._id
       await remove(postId, uid);
-      res.send({data: true})
+      res.json(true)
    } catch (e: any) {
       internalError(e, res)
    }
@@ -67,7 +67,7 @@ router.put('/:id', requireUser, mongoCtx(async (req: any, res: any) => {
       // @ts-ignore
       const uid = req.user._id
       const post = await update(postId, uid, req.body);
-      res.send({data: post});
+      res.json(post);
    } catch (e: any) {
       internalError(e, res);
    }
@@ -81,7 +81,7 @@ router.put('/react/:id', requireUser, mongoCtx(async (req: any, res: any) => {
       // @ts-ignore
       const uid = req.user._id
       const rs = await react(reactType as PostReactType, postId, uid);
-      res.send({data: rs})
+      res.json(rs)
    } catch (e: any) {
       internalError(e, res)
    }
@@ -94,7 +94,7 @@ router.put('/un-react/:id', requireUser, mongoCtx(async (req: any, res: any) => 
       // @ts-ignore
       const uid = req.user._id
       await unReact(postId, uid);
-      res.send({data: true})
+      res.json(true)
    } catch (e: any) {
       internalError(e, res)
    }
@@ -106,7 +106,7 @@ router.get('/comments/:id', mongoCtx(async (req: any, res: any) => {
          throw 'Post id is invalid'
       const page = Number(req.query?.page) || 1;
       const post = await getComments(postId, page);
-      res.send({data: post});
+      res.json(post);
    } catch (e: any) {
       internalError(e, res);
    }

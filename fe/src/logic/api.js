@@ -37,8 +37,7 @@ export const userAPI = {
   update: async (change) => exec(() => axios.put(`${API_URL}/user/update-profile`, change, axiosOpts)),
   signUp: async (email, password) => {
     try {
-      const rs = await axios.post(`${API_URL}/user/sign-up`, {email: email, password: password})
-      const {data} = rs.data;
+      const {data} = await axios.post(`${API_URL}/user/sign-up`, {email: email, password: password})
       if (data.token) {
         _saveAuthSession(data);
       } else {
@@ -51,8 +50,7 @@ export const userAPI = {
   },
   signIn: async (email, password) => {
     try {
-      const rs = await axios.post(`${API_URL}/user/sign-in`, {email, password})
-      const {data} = rs.data;
+      const {data} = await axios.post(`${API_URL}/user/sign-in`, {email, password})
       if (data.token) {
         _saveAuthSession(data);
       } else {

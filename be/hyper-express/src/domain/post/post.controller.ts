@@ -13,7 +13,7 @@ router.get('/', async (req: Request, res: Response) => {
    try {
       const {uid, cid, p} = req.query_parameters;
       const posts = await PostBL.getPosts(To.objectId(uid, 'uid is invalid'), cid === '0' ? null : To.objectId(cid, 'cid is invalid'), +p || 1);
-      res.send(JSON.stringify({data: posts}))
+      res.json(posts)
    } catch (e) {
       internalError(e, res)
    }
@@ -22,7 +22,7 @@ router.get('/:id', async (req: Request, res: Response) => {
    try {
       const postId = req.path_parameters.id
       const post = await PostBL.getPost(To.objectId(postId));
-      res.send(JSON.stringify({data: post}));
+      res.json(post);
    } catch (e) {
       internalError(e, res);
    }
@@ -36,7 +36,7 @@ router.post('/', {middlewares: [requireUser]}, async (req: AuthRequest, res: Res
          type, text, textVi, textEn, audio, photos, videos, tags,
          createdBy: req.user._id, of: ofPost
       })
-      res.send(JSON.stringify({data: post}))
+      res.json(post)
    } catch (e) {
       internalError(e, res)
    }
@@ -45,7 +45,7 @@ router.delete('/:id', {middlewares: [requireUser]}, async (req: AuthRequest, res
    try {
       const postId = req.path_parameters.id
       await PostBL.remove(To.objectId(postId, 'Post id is invalid'), req.user._id);
-      res.send(JSON.stringify({data: true}))
+      res.json(true)
    } catch (e) {
       internalError(e, res)
    }
@@ -54,7 +54,7 @@ router.put('/:id', {middlewares: [requireUser]}, async (req: AuthRequest, res: R
    try {
       const postId = req.path_parameters.id
       const post = await PostBL.update(To.objectId(postId, 'Post id is invalid'), req.user._id, await req.json());
-      res.send(JSON.stringify({data: post}));
+      res.json(post);
    } catch (e) {
       internalError(e, res);
    }
@@ -64,7 +64,7 @@ router.put('/react/:id', {middlewares: [requireUser]}, async (req: AuthRequest, 
       const postId = req.path_parameters.id
       const {reactType} = req.query
       const rs = await PostBL.react(reactType as PostReactType, To.objectId(postId, 'Post id is invalid'), req.user._id);
-      res.send(JSON.stringify({data: rs}))
+      res.json(rs)
    } catch (e) {
       internalError(e, res)
    }
@@ -73,7 +73,7 @@ router.put('/un-react/:id', {middlewares: [requireUser]}, async (req: AuthReques
    try {
       const postId = req.path_parameters.id
       await PostBL.unReact(To.objectId(postId, 'Post id is invalid'), req.user._id);
-      res.send(JSON.stringify({data: true}))
+      res.json(true)
    } catch (e) {
       internalError(e, res)
    }
@@ -83,7 +83,7 @@ router.get('/comments/:id', async (req: Request, res: Response) => {
       const postId = req.path_parameters.id;
       const page = +req.query.page || 1;
       const post = await PostBL.getComments(To.objectId(postId, 'Post id is invalid'), page);
-      res.send(JSON.stringify({data: post}));
+      res.json(post);
    } catch (e) {
       internalError(e, res);
    }

@@ -40,7 +40,7 @@ router.post('/sign-up', async (req: AuthRequest, res): Promise<any> => {
     const user = await createUser({username, email, password: hashPassword, createdAt: new Date()});
     const authUser : AuthUser = {_id: user._id, email: user.email, password: user.password, role: user.role}
     const token = jwt.sign({user: authUser}, process.env.SECRET, { expiresIn: '7d' });
-    res.cookie('token', token).send({data: {user, token}});
+    res.cookie('token', token).send({user, token});
   } catch (e) {
     internalError(e, res);
   }
@@ -53,7 +53,7 @@ router.post('/sign-in', async (req: AuthRequest, res): Promise<any> => {
     return res.status(400).send({error: 'USER_WITH_EMAIL_NOT_FOUND'});
   }
 
-  const validate = await await bcrypt.compare(password, user.password);
+  const validate = await bcrypt.compare(password, user.password);
   if (!validate) {
     return res.status(400).send({ error: 'INCORRECT_EMAIL_OR_PASSWORD' });
   }
@@ -65,32 +65,17 @@ router.post('/sign-in', async (req: AuthRequest, res): Promise<any> => {
 });
 router.post('/sign-out', async (req: AuthRequest, res): Promise<any> => {
   if (req.cookies['token']) {
-    return res.clearCookie('token').send({data: {result: true}});
-  } else {
-    return res.send({data: {result: true}});
+    res.clearCookie('token')
   }
+  res.json(true)
 });
 router.get('/auth', async (req: AuthRequest, res): Promise<any> => {
   try {
     const jwtToken = req.headers.authorization.split(' ')[1];
-    const decoded = jwt.decode(jwtToken, process.env.SECRET);
-    const expired = Date.now() > decoded.exp * 1000;
-    let user = decoded.user;
-
-    if (expired) {
-      // jwt expired -> get user info from provided username & password
-      user = await User.findOne({ email: user.email, password: user.password }, { _id: 1, email: 1, password: 1, role: 1 });
-
-      // if account password has been changed -> user not found -> token failed to renew -> return error
-      if (!user)
-        return res.status(400).send({error: 'INVALID_USER'})
-    }
-
-    if (!user)
-      return res.status(400).send({error: 'INVALID_USER'})
-
+    const {user} = jwt.verify(jwtToken, process.env.SECRET);
+    if (!user) return res.status(400).send({error: 'INVALID_USER'})
     const body = {_id: user._id, email: user.email, password: user.password, role: user.role}
-    const token = jwt.sign({user: body}, process.env.SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({user: body}, process.env.SECRET, { expiresIn: '7d' })
     return res.cookie('token', token).send({data: {user: body, token}});
   } catch (e) {
     internalError(e, res);
@@ -108,8 +93,7 @@ router.get('/about/:id', requireUser, async (req: AuthRequest, res): Promise<any
     } else {
       throw "Missing :id";
     }
-
-    return res.send({data: user});
+    return res.json(user)
   } catch (e) {
     internalError(e, res);
   }
@@ -122,7 +106,7 @@ router.put('/update-profile', requireUser, async (req: AuthRequest, res): Promis
     const requireRevalidateComputedUser = !_.isEmpty(avatar) || !_.isEmpty(fullName)
     if (requireRevalidateComputedUser)
       PostModel.updateMany({createdBy: authUser._id}, {byUser: _.pick(response, ['_id', 'fullName', 'username', 'avatar'])}).then(console.log).catch(console.error);
-    res.send({data: response});
+    res.send(response);
   } catch (e) {
     internalError(e, res);
   }

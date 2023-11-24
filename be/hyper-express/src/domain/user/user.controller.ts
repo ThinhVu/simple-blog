@@ -37,7 +37,7 @@ router.post('/sign-up', async (req: AuthRequest, res:Response): Promise<any> => 
     const user = await createUser({username, email, password: hashPassword, createdAt: new Date()});
     const authUser : AuthUser = {_id: user._id, email: user.email, password: user.password, role: user.role}
     const token = jwt.sign({user: authUser}, process.env.SECRET, { expiresIn: '7d' });
-    res.cookie('token', token).send(JSON.stringify({data: {user, token}}));
+    res.cookie('token', token).json({user, token});
   } catch (e) {
     internalError(e, res);
   }
@@ -58,14 +58,13 @@ router.post('/sign-in', async (req: AuthRequest, res: Response): Promise<any> =>
   const body = {_id: user._id, email: user.email, password: user.password, role: user.role}
   const token = jwt.sign({user: body}, process.env.SECRET, { expiresIn: '7d' });
 
-  return res.cookie('token', token).send(JSON.stringify({data: {user: body, token}}));
+  return res.cookie('token', token).json({user: body, token});
 });
 router.post('/sign-out', async (req: AuthRequest, res): Promise<any> => {
   if (req.cookies['token']) {
-    return res.clearCookie('token').send(JSON.stringify({data: {result: true}}));
-  } else {
-    return res.send(JSON.stringify({data: {result: true}}));
+    res.clearCookie('token')
   }
+  res.json(true);
 });
 router.get('/auth', async (req: AuthRequest, res: Response): Promise<any> => {
   try {
@@ -88,7 +87,7 @@ router.get('/auth', async (req: AuthRequest, res: Response): Promise<any> => {
 
     const body = {_id: user._id, email: user.email, password: user.password, role: user.role}
     const token = jwt.sign({user: body}, process.env.SECRET, { expiresIn: '7d' });
-    return res.cookie('token', token).send(JSON.stringify({data: {user: body, token}}));
+    return res.cookie('token', token).json({user: body, token});
   } catch (e) {
     internalError(e, res);
   }
@@ -106,7 +105,7 @@ router.get('/about/:id', {middlewares: [requireUser]}, async (req: AuthRequest, 
       throw "Missing :id";
     }
 
-    return res.send(JSON.stringify({data: user}));
+    return res.json(user);
   } catch (e) {
     internalError(e, res);
   }
@@ -119,7 +118,7 @@ router.put('/update-profile', {middlewares: [requireUser]}, async (req: AuthRequ
     const requireRevalidateComputedUser = !_.isEmpty(avatar) || !_.isEmpty(fullName)
     if (requireRevalidateComputedUser)
       PostModel.updateMany({createdBy: authUser._id}, {byUser: _.pick(response, ['_id', 'fullName', 'username', 'avatar'])}).then(console.log).catch(console.error);
-    res.send(JSON.stringify({data: response}));
+    res.json(response);
   } catch (e) {
     internalError(e, res);
   }
