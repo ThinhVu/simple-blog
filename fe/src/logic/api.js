@@ -27,7 +27,7 @@ async function exec(asyncFn) {
 let axiosOpts = {};
 
 async function _saveAuthSession({token}) {
-  axiosOpts = {headers: {Authorization: `bearer ${token}`}};
+  axiosOpts = {headers: {Authorization: `Bearer ${token}`}};
   window.localStorage.setItem('token', token);
   user.value = await userAPI.about('me');
 }
@@ -63,7 +63,7 @@ export const userAPI = {
   },
   auth: async token => {
     try {
-      const {data} = (await axios.get(`${API_URL}/user/auth`, {headers: {Authorization: `bearer ${token}`}})).data;
+      const {data} = (await axios.get(`${API_URL}/user/auth`, {headers: {Authorization: `Bearer ${token}`}})).data;
       if (data.token) {
         await _saveAuthSession(data);
       } else {
