@@ -13,10 +13,9 @@ const plugin = new Elysia()
     return {
       getAuthUser: () => {
         if (!bearer) throw 'INVALID_USER'
-        const {user, exp} = jwt.decode(bearer);
-        const expired = Date.now() > exp * 1000;
+        // @ts-ignore
+        const {user} = jwt.verify(bearer);
         if (!user) throw 'INVALID_USER'
-        if (expired) throw 'EXPIRED_TOKEN'
         return user
       }
     }
