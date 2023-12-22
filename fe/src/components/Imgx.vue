@@ -25,8 +25,9 @@ const mediaStyle = computed(() => {
 })
 const imgState = ref()
 const changeImgSrc = src => {
-  image.value.src = src;
   imgState.value = 'loading';
+  if (!src) return
+  image.value.src = src;
 }
 watch(() => props.src, changeImgSrc);
 onMounted(() => {
