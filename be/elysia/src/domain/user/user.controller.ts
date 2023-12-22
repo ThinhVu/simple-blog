@@ -8,9 +8,9 @@ import {
 import PostModel from '../post/post.model';
 import {Types} from "mongoose";
 import {AuthUser} from "../../constants/types";
-import {Elysia, t} from "elysia";
+import Elysia, {t} from "elysia";
 
-export default function useUser(app) {
+export default function useUser(app: Elysia) {
   app.post('/sign-up', async ({jwt, body: {email, password}, cookie}) => {
     if (!email || !password) throw new Error('MISSING_FIELD: email or password')
     if (await isUserWithEmailExisted(email)) throw new Error('EMAIL_HAS_BEEN_USED')
@@ -24,6 +24,11 @@ export default function useUser(app) {
     const token = await jwt.sign({user: authUser});
     cookie.value.token = token;
     return {user, token}
+  }, {
+    body: t.Object({
+      email: t.String(),
+      password: t.String()
+    })
   })
   app.post('/sign-in', async ({jwt, body: {email, password}, cookie}) => {
     const user = await User.findOne({email});
@@ -41,6 +46,11 @@ export default function useUser(app) {
     cookie.value.token = token
 
     return {user: body, token}
+  }, {
+    body: t.Object({
+      email: t.String(),
+      password: t.String()
+    })
   });
   app.post('/sign-out', async ({cookie}) => {
     if (cookie.value.token) {
@@ -77,6 +87,11 @@ export default function useUser(app) {
         .then(console.log)
         .catch(console.error)
     return response
+  }, {
+    body: t.Object({
+      avatar: t.String(),
+      fullName: t.String()
+    })
   })
   return app
 }

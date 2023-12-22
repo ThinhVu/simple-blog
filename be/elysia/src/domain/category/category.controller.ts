@@ -1,9 +1,9 @@
 import * as CategoryBL from "./category.service";
 import {Types} from "mongoose";
-import {t} from 'elysia'
+import Elysia, {t} from 'elysia'
 import {IUser} from "../user/user.model";
 
-export default function useUser(app) {
+export default function useUser(app: Elysia) {
    app.get('/:id', async ({params: {id}}) => {
       return CategoryBL.getCategories(new Types.ObjectId(id))
    }, {

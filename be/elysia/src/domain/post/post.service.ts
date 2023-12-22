@@ -62,10 +62,10 @@ export const getPosts = async (uid: Types.ObjectId, cid: Types.ObjectId | undefi
       .sort({pinned: -1, createdAt: -1})
    )
 }
-export const getPost = async (_id: Types.ObjectId): Promise<IPost> => {
+export const getPost = async (_id: Types.ObjectId): Promise<IPost | null> => {
    return PostModel.findOne({_id}, omitFields)
 }
-export const update = async (_id: Types.ObjectId, createdBy: Types.ObjectId, change: Partial<IPost>): Promise<IPost> => {
+export const update = async (_id: Types.ObjectId, createdBy: Types.ObjectId, change: Partial<IPost>): Promise<IPost | null> => {
    return PostModel.findOneAndUpdate({_id, createdBy}, {$set: change})
 }
 export const remove = async (_id: Types.ObjectId, createdBy: Types.ObjectId): Promise<void> => {
