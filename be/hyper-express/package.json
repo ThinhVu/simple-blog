@@ -23,7 +23,7 @@
     "lodash": "^4.17.21",
     "mongoose": "^5.10.8",
     "nodemailer": "^6.4.2",
-    "socket.io": "^4.5.1",
+    "socket.io": "^4.7.2",
     "socket.io-client": "^4.5.1"
   },
   "devDependencies": {
