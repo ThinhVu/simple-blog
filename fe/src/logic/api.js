@@ -20,7 +20,7 @@ async function exec(asyncFn) {
       console.log(rs)
     return rs;
   } catch (e) {
-    console.log(e)
+    console.error(e)
   }
 }
 
@@ -77,8 +77,8 @@ export const userAPI = {
 }
 
 export const categoryAPI = {
-  gets: async (uid) => exec(() => axios.get(`${API_URL}/category/${uid}`)),
-  create: async (payload) => exec(() => axios.post(`${API_URL}/category/`, payload, axiosOpts)),
+  gets: async (uid) => exec(() => axios.get(`${API_URL}/category/${uid || '0'}`)),
+  create: async (payload) => exec(() => axios.post(`${API_URL}/category`, payload, axiosOpts)),
   update: async (_id, change) => exec(() => axios.put(`${API_URL}/category/${_id}`, change, axiosOpts)),
   remove: async (_id) => exec(() => axios.delete(`${API_URL}/category/${_id}`)),
 }
