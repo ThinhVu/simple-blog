@@ -5,11 +5,14 @@ import {userAPI} from './logic/api';
 import Desktop from '@/components/SubPage/Desktop';
 import FeedPage from '@/components/SubPage/FeedPage';
 import PostPage from '@/components/SubPage/PostPage';
+import socketConnect from "@/logic/socket";
 
 async function initApp() {
   let token = window.localStorage.getItem('token')
-  if (token)
+  if (token) {
     await userAPI.auth(token);
+    socketConnect(token)
+  }
 
   const router = createRouter({
     history: createWebHistory(),
